@@ -23,3 +23,4 @@ app.post('/inventory/:sku/reserve', (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`inventory-service listening on ${PORT}`));
+// v2 - testing CI webhook trigger
