@@ -1,0 +1,29 @@
+name: Build and Deploy to OpenShift
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install oc CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+          tar -xzf openshift-client-linux.tar.gz
+          sudo mv oc /usr/local/bin/
+
+      - name: Log in to OpenShift
+        run: |
+          oc login --token=${{ secrets.OPENSHIFT_TOKEN }} --server=${{ secrets.OPENSHIFT_SERVER }}
+          oc project ${{ secrets.OPENSHIFT_NAMESPACE }}
+
+      - name: Trigger builds
+        run: |
+          oc start-build inventory-service --follow
+          oc start-build order-service --follow
+          oc start-build api-gateway --follow
